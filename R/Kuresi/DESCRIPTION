@@ -1,0 +1,33 @@
+Package: Kuresi
+Type: Package
+Title: Competitive fitness of Cancer clones
+Authors: Patrick C.N. Martin <patrick.martin@cshs.org>
+Version: 0.0.1
+Maintainer: Patrick C.N. Martin <patrick.martin@cshs.org>
+License: GPL-3 + file LICENSE
+Collate: competition_score.r
+  utils.r
+  viz_utils.r
+  sanity_checks.r
+  progress.r
+Depends: R (>= 4.0.0),
+  vesalius
+Imports: grDevices,
+  stats,
+  utils,
+  ggplot2,
+  patchwork,
+  ggpubr,
+  rjson,
+  Matrix,
+  hdf5r,
+  Seurat,
+  RColorBrewer
+Suggests: knitr,
+  RUnit,
+  rmarkdown,
+  testthat (>= 3.0.0)   
+Encoding: UTF-8
+LazyData: true
+VignetteBuilder: knitr
+RoxygenNote: 7.3.2
