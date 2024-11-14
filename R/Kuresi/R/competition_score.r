@@ -173,7 +173,7 @@ compute_competition_outcomes <- function(seed_assay,
     expressed,
     repressed = NULL,
     query_assay = NULL,
-    integration_method = "CCAIntegration",
+    integration_method = "none",
     nfeatures = 2000,
     dimensions = 30,
     use_counts = "raw",
@@ -217,10 +217,10 @@ compute_competition_outcomes <- function(seed_assay,
         query_counts <- get_counts(query_assay, type = use_counts)
         integrated <- count_integration(seed_counts,
             query_counts,
+            integration_method = integration_method,
             nfeatures = nfeatures,
             dimensions = dimensions,
-            features = signal,
-            verbose)
+            features = signal)
         trial <- paste0(trial_seed, "_", trial_query)
         query_trial <- vesalius:::check_territory_trial(query_assay, trial_query)
         if (is.null(labels_query)){

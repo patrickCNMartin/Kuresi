@@ -24,14 +24,19 @@ def compute_ratio_score(adata:AnnData,
     g2_counts = adata.X[gene_group_2]
     
     if scale:
-        # Option to parse the scaler directly 
+        # Option to parse the sklearn scaler directly 
         scaler = StandardScaler()
         g1_counts = scaler.fit_transform(g1_counts)
         g2_counts = scaler.fit_transform(g2_counts)
     
     if key is not None:
-        what_do
+        keys = adata.obs[key].index
+        values = adata.obs[key].to_numpy()
+    else :
+        keys = adata.obs[key].index
+        values = [0] * len(keys)
     
-    
+    g1_score = compute_score(g1_counts, keys, values, score_type)
+    g2_score = compute_score(g2_counts, keys, values, score_type)
     
     return adata

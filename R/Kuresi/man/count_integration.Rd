@@ -7,9 +7,9 @@
 count_integration(
   query,
   seed,
+  integration_method = "cca",
   nfeatures = 2000,
   dimensions = 30,
-  infer = FALSE,
   features = NULL
 )
 }
@@ -19,14 +19,14 @@ count_integration(
 \item{dimensions}{interger - number of dimensions integrated latent space
 dimensions.}
 
-\item{infer}{logical - back infer original counts by reversing reduced 
-dimensional space roations.}
-
 \item{matched}{matrix - matrix containing counts from matched/mapped assay}
 
 \item{reference}{matrix - matrix containing counts from reference assay}
 
 \item{method}{character - Seurat integration method to use}
+
+\item{infer}{logical - back infer original counts by reversing reduced 
+dimensional space roations.}
 
 \item{signal}{character - defining which signal should be returned:
 variable_features, all_features or custom gene list.}

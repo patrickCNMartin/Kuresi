@@ -231,7 +231,7 @@ view_elo <- function(elo_scores){
 }
 
 #' Create color palette to vizualize seed and query scores
-#' @importFrom RColorBrewer colorRampPalette
+#' @importFrom grDevices colorRampPalette
 #' @export
 generate_palette <- function(palette, seed, query){
     pal <- colorRampPalette(palette)

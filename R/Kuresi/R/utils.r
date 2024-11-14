@@ -393,44 +393,68 @@ pseudo_map <- function(query_assay, seed_assay){
 #' @importFrom Seurat ScaleData RunPCA IntegrateLayers
 count_integration <- function(query,
     seed,
+    integration_method = 'cca',
     nfeatures = 2000,
     dimensions = 30,
-    infer = FALSE,
     features = NULL) {
     query <- Seurat::CreateSeuratObject(query)
     seed <- Seurat::CreateSeuratObject(seed)
-    integrated <- list(seed, query)
-    integrated <- lapply(integrated, function(x, nfeatures){
-        x <- Seurat::NormalizeData(x, verbose = FALSE) %>%
+    
+    if (integration_method != 'none'){
+        integrated <- list(seed, query)
+        integrated <- lapply(integrated, function(x, nfeatures){
+            x <- Seurat::NormalizeData(x, verbose = FALSE) %>%
+                Seurat::FindVariableFeatures(verbose = FALSE, nfeatures = nfeatures)
+            return(x)
+        }, nfeatures = nfeatures)
+        features <- pad_features(features, integrated, nfeatures)
+        anchors <- suppressWarnings(Seurat::FindIntegrationAnchors(object.list = integrated,
+            anchor.features = features,
+            dims = seq(1, dimensions),
+            reduction = integration_method,
+            verbose = FALSE))
+        integrated <- suppressWarnings(Seurat::IntegrateData(anchors,
+            dims = seq(1, dimensions),
+            verbose = FALSE))
+        counts <- integrated@assays$integrated
+        counts <- list("raw" = counts@counts, "data" = counts@data)
+    } else {
+        integrated <- merge(seed, query)
+        integrated <- SeuratObject::JoinLayers(integrated)
+        integrated <- Seurat::NormalizeData(integrated, verbose = FALSE) %>%
             Seurat::FindVariableFeatures(verbose = FALSE, nfeatures = nfeatures)
-        return(x)
-    }, nfeatures = nfeatures)
-    features <- pad_features(features, integrated, nfeatures)
-    anchors <- suppressWarnings(Seurat::FindIntegrationAnchors(object.list = integrated,
-        anchor.features = features,
-        dims = seq(1, dimensions),
-        reduction = "cca",
-        verbose = FALSE))
-    integrated <- suppressWarnings(Seurat::IntegrateData(anchors,
-        dims = seq(1, dimensions),
-        verbose = FALSE))
-    counts <- integrated@assays$integrated
-    counts <- list("raw" = counts@counts, "data" = counts@data)
+        counts <- list(
+            "raw" = Seurat::GetAssayData(integrated, layer = 'counts')[features, ],
+            "data" = Seurat::GetAssayData(integrated, layer = 'data')[features, ])
+    }
+    
     return(counts)
 }
 
 pad_features <- function(features, integrated, nfeatures) {
     if (length(features) >= nfeatures){
         features <- features[sample(features, size = nfeatures)]
-    } else {
+    } else if (length(integrated) == 2) {
         pad_seed <- Seurat::VariableFeatures(integrated[[1]])
         pad_query <- Seurat::VariableFeatures(integrated[[2]])
         pad <- intersect(pad_seed, pad_query)
         pad <- pad[!pad %in% features]
+
         if (length(pad) < nfeatures){
-            nfeatures <- length(pad)
+            pad_length <- nfeatures - length(pad)
         }
-        features <- c(features, pad[seq(1, nfeatures - length(features))])
+        if (pad_length > 0) {
+            features <- c(features, pad[seq(1, pad_length)])
+        } 
+    } else {
+        pad <- Seurat::VariableFeatures(integrated)
+        pad <- pad[!pad %in% features]
+        if (length(pad) < nfeatures){
+            pad_length <- nfeatures - length(pad)
+        }
+        if (pad_length > 0) {
+            features <- c(features, pad[seq(1, pad_length)])
+        } 
     }
     return(features)
 }
