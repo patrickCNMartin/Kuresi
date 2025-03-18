@@ -1,175 +1,33 @@
-#' @importFrom vesalius get_territories get_counts
-#' @importFrom dplyr %>%
-#' @importFrom utils tail
-#' @export
-compute_ratio_score <- function(vesalius_assay,
-    group_1 = NULL,
-    group_2 = NULL,
-    norm = "log_norm",
-    weights = NULL,
-    scale = FALSE,
-    center_score = FALSE,
-    by_territory = TRUE,
-    trial = "Territory",
-    score_type = c("mean_ratio", "mean_sub", "sum_ratio", "sum_sub"),
-    score_only = FALSE,
-    add_name = NULL,
-    verbose = TRUE) {
-    #-------------------------------------------------------------------------#
-    # First we get counts out
-    #-------------------------------------------------------------------------#
-    assay <- vesalius_assay@assay
-    counts <- get_counts(vesalius_assay, type = norm)
-    #-------------------------------------------------------------------------#
-    # next we filter and create sub counts
-    #-------------------------------------------------------------------------#
-    if (is.null(group_1) || is.null(group_2)) {
-        stop("Please provide gene groups. 
-        Function needs genes for group_1 and group_2")
-    }
-
-    g1_counts <- counts[rownames(counts) %in% group_1, ]
-    g2_counts <- counts[rownames(counts) %in% group_2, ]
-
-    #-------------------------------------------------------------------------#
-    # add weights to counts if weights are provided
-    #-------------------------------------------------------------------------#
-    if (!is.null(weights)) {
-        for (weight in seq_along(weights)) {
-            if (names(weight)[weight] %in% rownames(g1_counts)) {
-                g1_counts[rownames(g1_counts) == names(weights)[weight], ] <-
-                g1_counts[rownames(g1_counts) == names(weights)[weight], ] *
-                    weights[weight]
-            } else if (names(weight)[weight] %in% rownames(g2_counts)) {
-                g2_counts[rownames(g2_counts) == names(weights)[weight], ] <-
-                g2_counts[rownames(g2_counts) == names(weights)[weight], ] *
-                    weights[weight]
-            } else {
-                next
-            }
-        }
-    }
-    #-------------------------------------------------------------------------#
-    # Scaling counts
-    #-------------------------------------------------------------------------#
-    if (scale) {
-        g1_counts <- t(scale(t(as.matrix(g1_counts))))
-        g2_counts <- t(scale(t(as.matrix(g2_counts))))
-    }
-    g1_counts <- as(g1_counts, "CsparseMatrix")
-    g2_counts <- as(g2_counts, "CsparseMatrix")
-    #-------------------------------------------------------------------------#
-    # Computing  score
-    #-------------------------------------------------------------------------#
-    g1_score <- compute_score(vesalius_assay,
-        g1_counts,
-        by_territory,
-        score_type[1],
-        trial)
-    g2_score <- compute_score(vesalius_assay,
-        g2_counts,
-        by_territory,
-        score_type[1],
-        trial)
-    #-------------------------------------------------------------------------#
-    # compute ratio
-    #-------------------------------------------------------------------------# 
-    if (grepl("ratio", score_type)) {
-        score <- (g1_score + 1) / (g2_score + 1)
-    } else if (grepl("sub", score_type)) {
-        score <- g1_score - g2_score
-    }
-
-    #-------------------------------------------------------------------------#
-    # centering score or return normalised
-    # this is stupid -> center only if ratio otherwise means nothing 
-    # TODO fix this nonsense
-    #-------------------------------------------------------------------------#
-    if (center_score) {
-        score <- score - 1
-    } else {
-        score <- (score - min(score)) / (max(score) - min(score))
-    }
-
-    #-------------------------------------------------------------------------#
-    # scoe only or create ves assay object 
-    #-------------------------------------------------------------------------#
-    if (score_only) {
-        return(round(score, digits = 5))
-    } else if(!score_only) {
-        territories <- get_territories(vesalius_assay)[, c("barcodes","x","y")]
-        if (!is.null(add_name)){
-            new_trial <- vesalius:::create_trial_tag(colnames(territories),
-                add_name) %>%
-                tail(1)
-        } else {
-             new_trial <- vesalius:::create_trial_tag(colnames(territories),
-                "Competition_score") %>%
-                tail(1)
-        }
-       
-        territories <- cbind(territories, round(score,digits = 5))
-        colnames(territories) <- c("barcodes","x","y", new_trial)
-        vesalius_assay <- vesalius:::update_vesalius_assay(vesalius_assay,
-            territories,
-            "territories")
-        commit <- vesalius:::create_commit_log(arg_match = as.list(match.call()),
-            default = formals(compute_ratio_score))
-        vesalius_assay <- vesalius:::commit_log(vesalius_assay,
-            commit,
-            assay)
-        return(vesalius_assay)
-    } 
-
-}
-
-
-
-compute_score <- function(vesalius_assay,
-    counts,
-    by_territory = TRUE,
-    score_type,
-    trial = "Territory") {
-    territories <- vesalius:::check_territory_trial(vesalius_assay, trial)
-    score <- rep(0, length(territories$barcodes))
-    names(score) <- territories$barcodes
-    ter <- unique(territories$trial)
-    #-------------------------------------------------------------------------#
-    # prepare function calls
-    # Might need to adpate this if there is only one gene
-    #-------------------------------------------------------------------------#
-    one_row <- function_call(score_type, single = TRUE)
-    multi_row <- function_call(score_type, single = FALSE, by_territory)
-    if (by_territory) {
-        for (j in seq_along(ter)) {
-            barcodes <- territories$barcodes
-            barcodes <- barcodes[territories$trial == ter[j]]
-            g <- counts[, colnames(counts) %in% barcodes]
-            if (is.null(dim(g))) {
-                g_loc <- one_row(g)
-            } else {
-                g_loc <- multi_row(g)
-            }
-            if (ter[j] == "isolated") {
-                score[barcodes] <- 0
-            } else {
-                score[barcodes] <- median(g_loc)
-            }
-        }
-    } else {
-        score[match(colnames(counts), names(score))] <- multi_row(counts)
-    }
-    return(score)
-}
-
-
 #-----------------------------------------------------------------------------#
 ################################ ELO COST #####################################
 #-----------------------------------------------------------------------------#
+compute_competition_outcomes <- function(
+    counts,
+    grouping,
+    expressed,
+    grouping_name = NULL,
+    repressed = NULL,
+    log_fc = 0,
+    pval = 0.05) {
+    #-------------------------------------------------------------------------#
+    # Get groupings
+    #-------------------------------------------------------------------------#
+    grouping_name <- check_grouping_name(grouping, grouping_name)
+    grouping <- split(grouping, grouping[, grouping_name])
+    #-------------------------------------------------------------------------#
+    # Looping over grouping subsets
+    #-------------------------------------------------------------------------#
+    for (s in seq_along(grouping)){
+        for (q in seq_along(grouping)){
+            s_counts <- counts[, rownames(grouping[[s]])]
+            q_counts <- counts[, rownames(grouping[[q]])]
+        }
+    }
+}
 
 #'@importFrom vesalius identify_markers
 #' @export
-compute_competition_outcomes <- function(seed_assay,
+compute_competition_outcomes_old <- function(seed_assay,
     expressed,
     repressed = NULL,
     query_assay = NULL,

@@ -10,6 +10,8 @@ Collate: competition_score.r
   viz_utils.r
   sanity_checks.r
   progress.r
+  ratio_scores.r
+  data.r
 Depends: R (>= 4.0.0),
   vesalius
 Imports: grDevices,
