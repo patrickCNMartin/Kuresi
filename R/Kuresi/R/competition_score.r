@@ -7,6 +7,7 @@ compute_competition_outcomes <- function(
     expressed,
     grouping_name = NULL,
     repressed = NULL,
+    method = "wilcox",
     log_fc = 0,
     pval = 0.05) {
     #-------------------------------------------------------------------------#
@@ -21,6 +22,9 @@ compute_competition_outcomes <- function(
         for (q in seq_along(grouping)){
             s_counts <- counts[, rownames(grouping[[s]])]
             q_counts <- counts[, rownames(grouping[[q]])]
+            degs <- switch(EXPR = method,
+                "wilcox" = k_wilcox(s_counts, q_counts),
+                "edgeR" = k_edgeR(s_counts, q_counts))
         }
     }
 }
