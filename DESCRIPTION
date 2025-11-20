@@ -12,6 +12,7 @@ Collate: competition_score.r
   progress.r
   ratio_scores.r
   data.r
+  degs.r
 Depends: R (>= 4.0.0),
   vesalius
 Imports: grDevices,
