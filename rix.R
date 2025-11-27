@@ -32,3 +32,5 @@ rix(
   overwrite = TRUE,
   print = TRUE
 )
+
+file.remove(".Rprofile")
