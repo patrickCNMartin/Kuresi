@@ -18,7 +18,9 @@ rix(
   "roxygen2",
   "devtools",
   "rix",
-  "rlang"),
+  "rlang",
+  "styler",
+  "lintr"),
   system_pkgs = NULL,
   git_pkgs = list(
     package_name = "Vesalius",

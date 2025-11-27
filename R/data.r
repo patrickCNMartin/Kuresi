@@ -3,7 +3,7 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @name coordinates 
+#' @name coordinates
 #' @usage data(Kuresi)
 #' @source  produced by \url{https://github.com/WonLab-CS/oneiric}
 #' @format coordinate data frame
