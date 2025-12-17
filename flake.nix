@@ -2,7 +2,7 @@
   description = "Kuresi Development Shell";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/00f459c69df1086032022158cfe9f8f8530b1788";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
