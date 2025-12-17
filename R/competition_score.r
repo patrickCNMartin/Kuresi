@@ -3,31 +3,53 @@
 #-----------------------------------------------------------------------------#
 compute_competition_outcomes <- function(
     counts,
-    grouping,
-    expressed,
-    grouping_name = NULL,
-    repressed = NULL,
+    groups,
+    gene_set1,
+    group_name = NULL,
+    gene_set2 = NULL,
     method = "wilcox",
     log_fc = 0,
     pval = 0.05) {
   #-------------------------------------------------------------------------#
   # Get groupings
   #-------------------------------------------------------------------------#
-  grouping_name <- check_grouping_name(grouping, grouping_name)
-  grouping <- split(grouping, grouping[, grouping_name])
+  group_id <- check_grouping(groups, group_name)
+  group_id <- split(group_id, group_id[, "group_id"]) 
+  #-------------------------------------------------------------------------#
+  # Verify genes sets
+  #-------------------------------------------------------------------------#
+  gene_set1 <- check_gene_set(counts, gene_set1)
+  gene_set2 <- check_gene_set(counts, gene_set2)
+  gene_set <- c(gene_set1, gene_set2)
+  if (is.null(gene_set)) {
+    stop("Please provide at least one gene set (gene_set1 or gene_set2)")
+  }
   #-------------------------------------------------------------------------#
   # Looping over grouping subsets
   #-------------------------------------------------------------------------#
-  for (s in seq_along(grouping)) {
-    for (q in seq_along(grouping)) {
-      s_counts <- counts[, rownames(grouping[[s]])]
-      q_counts <- counts[, rownames(grouping[[q]])]
-      degs <- switch(EXPR = method,
-        "wilcox" = k_wilcox(s_counts, q_counts),
-        "edgeR" = k_edgeR(s_counts, q_counts)
+  degs <- vector("list", length(group_id))
+  names(degs) <- names(group_id)
+  degs <- lapply(degs, function(x, group_id) {
+    tmp <- vector("list", length(group_id))
+    names(tmp) <- names(group_id)
+    return(tmp)
+  }, group_id = group_id)
+  
+  for (s in seq_along(group_id)) {
+    for (q in seq_along(group_id)) {
+      s_counts <- as.matrix(counts[gene_set, group_id[[s]]$cell_id])
+      q_counts <- as.matrix(counts[gene_set, group_id[[q]]$cell_id])
+      tmp <- switch(EXPR = method,
+        "wilcox" = k_wilcox(s_counts, q_counts)
       )
+      degs[[s]][[q]] <- get_outcomes(tmp,
+                                     gene_set1,
+                                     gene_set2,
+                                     fold_change = log_fc,
+                                     pval = pval)
     }
   }
+  return(degs)
 }
 
 #' @importFrom vesalius identify_markers
@@ -153,15 +175,16 @@ compute_competition_outcomes_old <- function(
 
 get_outcomes <- function(
     deg,
-    expressed,
-    repressed,
+    gene_set1,
+    gene_set2,
+    fold_change = 0.1,
     pval = 0.05) {
-  total_genes <- length(c(expressed, repressed))
-  expressed <- deg$genes %in% expressed
-  repressed <- deg$genes %in% repressed
+  total_genes <- length(c(gene_set1, gene_set2))
+  gene_set1 <- deg$genes %in% gene_set1
+  gene_set2 <- deg$genes %in% gene_set2
   outcome <- rep(0, nrow(deg))
-  outcome[expressed] <- as.numeric(deg$fold_change[expressed] > 0)
-  outcome[repressed] <- as.numeric(deg$fold_change[repressed] < 0)
+  outcome[gene_set1] <- as.numeric(deg$fold_change[gene_set1] > fold_change)
+  outcome[gene_set2] <- as.numeric(deg$fold_change[gene_set2] < fold_change)
   outcome[deg$p_value_adj > pval] <- 0.5
   outcome <- c(outcome, rep(0.5, times = total_genes - length(outcome)))
   return(outcome)

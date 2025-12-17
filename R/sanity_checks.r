@@ -119,11 +119,42 @@ validate_input <- function(
   return(0)
 }
 
-check_grouping_name <- function(grouping, grouping_name) {
-  is_in <- grepl(grouping_name, colnames(grouping))
-  if (is_in) {
-    return(grouping_name)
+check_grouping <- function(group_id, group_name) {
+  if (is(group_id, "data.frame") || is(group_id,"matrix")) {
+    if (is.null(group_name)) {
+      stop("No group name specified for group_id data frame")
+    }
+    if (!group_name %in% colnames(group_id)) {
+      stop("Grouping name is not present in grouping data frame.")
+    }
+    group_id <- data.frame("cell_id" = rownames(group_id),
+                           "group_id" = group_id[, group_name])
+  } else if (is(grouping, "vector")) {
+    if (is.null(names(group_id))) {
+      stop("No cell ids in group_id vector - add cell ids as names")
+    }
+    group_id <- data.frame("cell_id" = names(group_id),
+                           "group_id" = group_id)
   } else {
-    stop("Value Error: Grouping name is not present in grouping data frame.")
+    stop("Unsupported group_id format - use data.frame/matrix/vector")
+  }
+  return(group_id)
+}
+
+check_gene_set <- function(counts, genes){
+  if (!is.null(genes)) {
+    gs <- genes[genes %in% rownames(counts)]
+    if (length(gs) == 0) {
+      stop("No genes provided are present in count matrix")
+    }
+    if (length(gs) < length(gs)) {
+      warning(paste0(
+        paste0(!genes %in% gs, sep = " ", collapse = " "),
+        " are not present in count matrix"
+      ))
+    }
+    return(gs)
+  } else {
+    return(genes)
   }
 }

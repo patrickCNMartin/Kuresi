@@ -1,7 +1,8 @@
 #' @export
 compute_ratio_bygroup <- function(
     counts,
-    group = NULL,
+    groups,
+    group_name = NULL,
     genes_1 = NULL,
     genes_2 = NULL,
     method = c("mean_ratio", "mean_sub", "sum_ratio", "sum_sub"),
@@ -11,14 +12,15 @@ compute_ratio_bygroup <- function(
     center = FALSE,
     add_name = NULL,
     verbose = TRUE) {
-  if (is.null(group)) {
-    stop("Please provide a data frame of cell IDs and group IDs.\n
-    Otherwise please use compute_ratio_score for a single group")
-  }
-  groups <- split(group, group[, 2])
-  for (g in seq_along(groups)) {
+  #-------------------------------------------------------------------------#
+  # Get groupings
+  #-------------------------------------------------------------------------#
+  group_id <- check_grouping(groups, group_name)
+  group_id <- split(group_id, group_id[, "group_id"])
+ 
+  for (g in seq_along(group_id)) {
     scores <- compute_ratio_score(counts,
-                                  cells = groups[, 1],
+                                  cells = group_id[[g]]$cell_id,
                                   genes_1 = genes_1,
                                   genes_2 = genes_2,
                                   method = method,

@@ -1,14 +1,16 @@
-k_wilcox <- function(s_counts, q_counts) {
-  log2_fc <- log2(rowMeans(s_counts) - rowMeans(q_counts))
+k_wilcox <- function(s_counts, q_counts, genes) {
+  fc <- rowMeans(s_counts) - rowMeans(q_counts)
   genes <- rownames(s_counts)
   p_val <- sapply(
     seq(1, nrow(s_counts)), function(idx, s_counts, q_counts) {
       return(
         suppressWarnings(
-          wilcox.test(s_counts[idx, ], q_counts[idx, ])$p.value
+          wilcox.test(as.vector(s_counts[idx, ]),as.vector(q_counts[idx, ]))$p.value
         )
       )
-    }
+    },
+    s_counts = s_counts,
+    q_counts = q_counts
   )
   effect_size <- sapply(p_val, effect_size,
     s_counts = ncol(s_counts),
@@ -18,14 +20,14 @@ k_wilcox <- function(s_counts, q_counts) {
     "genes" = genes,
     "p_value" = p_val,
     "p_value_adj" = p.adjust(p_val, "bonferroni"),
-    "log2_fc" = log2_fc,
+    "fold_change" = fc,
     "effect_size" = effect_size
   )
   return(degs)
 }
 
-k_ttest <- function(s_counts, q_counts) {
-  log2_fc <- log2(rowMeans(s_counts) - rowMeans(q_counts))
+k_ttest <- function(s_counts, q_counts, genes) {
+  fc <- rowMeans(s_counts) - rowMeans(q_counts)
   genes <- rownames(s_counts)
   p_val <- sapply(
     seq(1, nrow(s_counts)), function(idx, s_counts, q_counts) {
@@ -34,7 +36,9 @@ k_ttest <- function(s_counts, q_counts) {
           t.test(s_counts[idx, ], q_counts[idx, ])$p.value
         )
       )
-    }
+    },
+    s_counts = s_counts,
+    q_counts = q_counts
   )
   effect_size <- sapply(p_val, effect_size,
     s_counts = ncol(s_counts),
@@ -44,7 +48,7 @@ k_ttest <- function(s_counts, q_counts) {
     "genes" = genes,
     "p_value" = p_val,
     "p_value_adj" = p.adjust(p_val, "bonferroni"),
-    "log2_fc" = log2_fc,
+    "fold_change" = fc,
     "effect_size" = effect_size
   )
   return(degs)
