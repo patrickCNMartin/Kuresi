@@ -1,5 +1,5 @@
 {
-  description = "R development environment with Vesalius and dependencies";
+  description = "Kuresi Development Shell";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/00f459c69df1086032022158cfe9f8f8530b1788";
@@ -85,7 +85,7 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          LOCALE_ARCHIVE = if pkgs.system == "x86_64-linux" then "${pkgs.glibcLocales}/lib/locale/locale-archive" else "";
+          LOCALE_ARCHIVE = if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then "${pkgs.glibcLocales}/lib/locale/locale-archive" else "";
           LANG = "en_US.UTF-8";
           LC_ALL = "en_US.UTF-8";
           LC_TIME = "en_US.UTF-8";
