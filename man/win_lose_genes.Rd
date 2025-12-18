@@ -6,6 +6,11 @@
 \usage{
 win_lose_genes()
 }
+\value{
+A list containing two character vectors: "win"
+  (pro-competitive genes) and "lose" (anti-competitive genes).
+}
 \description{
-Create Win/Lose gene list
+Returns predefined lists of "win" and "lose" genes associated with
+competitive fitness in cancer cells.
 }

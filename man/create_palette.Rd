@@ -2,17 +2,19 @@
 % Please edit documentation in R/viz_utils.r
 \name{create_palette}
 \alias{create_palette}
-\title{territories present. If required the colours will be randomly assinged
-to each territory. Note that as the territory plot 
-return a ggplot object, you can easily override the color scheme.}
+\title{Create color palette for scores}
 \usage{
-create_palette(territories, randomise)
+create_palette(score)
+}
+\arguments{
+\item{score}{Data frame with a "score" column (should be a factor).}
 }
 \value{
-color vector
+Character vector of color values.
 }
 \description{
-territories present. If required the colours will be randomly assinged
-to each territory. Note that as the territory plot 
-return a ggplot object, you can easily override the color scheme.
+Generates a color palette based on the number of unique score levels.
+Uses a predefined color scheme with colors randomly assigned to each
+territory. Note that as the territory plot returns a ggplot object,
+you can easily override the color scheme.
 }

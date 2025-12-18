@@ -1,79 +1,38 @@
+
+#' Plot competition scores spatially
+#'
+#' Creates a ggplot visualization of competition scores with optional spatial
+#' image background and score binning.
+#'
+#' @param score Data frame with columns for x, y coordinates and score values.
+#' @param cex Numeric text size multiplier (default: 10).
+#' @param cex_pt Numeric point size (default: 1).
+#' @param alpha Numeric transparency value between 0 and 1 (default: 0.65).
+#' @param bins Integer number of bins for discrete coloring, or NULL
+#'   for continuous (default: NULL).
+#' @param img Optional imager object for background image.
+#' @return A ggplot object.
+#' @importFrom ggplot2 ggplot geom_point geom_raster
+#'   scale_colour_gradientn scale_color_manual scale_fill_identity
+#'   theme_classic theme element_text guides guide_legend labs
+#'   scale_x_continuous scale_y_continuous aes
+#' @importFrom ggnewscale new_scale
+#' @importFrom dplyr mutate
+#' @importFrom grDevices rgb
 score_plot <- function(score,
                        cex = 10,
+                       cex_pt = 1,
                        alpha = 0.65,
-                       bin = NULL,
+                       bins = NULL,
                        img = NULL) {
+  targets <- colnames(score)
+  colnames(score) <- c("x", "y", "score")
   g <- ggplot()
   if (!is.null(img) && is(img, "imager")) {
     img <- as.data.frame(img, wide = "c") %>%
         mutate(rgb_val = rgb(c.1, c.2, c.3))
       img$x <- rev(img$x)
-  }
-
-
-}
-
-
-
-
-
-
-
-#' @export
-#' @importFrom ggplot2 ggplot geom_point aes facet_wrap theme_classic
-#' @importFrom ggplot2 scale_color_manual theme element_text scale_colour_gradientn
-#' @importFrom ggplot2 aes
-#' @importFrom ggplot2 guides guide_legend labs geom_polygon
-#' @importFrom ggplot2 scale_fill_manual scale_x_continuous scale_y_continuous
-#' @importFrom imager imrotate
-#' @importFrom ggnewscale new_scale
-score_plot <- function(
-    vesalius_assay,
-    trial = "last",
-    cex = 10,
-    cex_pt = 1,
-    alpha = 0.65,
-    randomise = FALSE,
-    use_image = FALSE) {
-  #--------------------------------------------------------------------------#
-  # Dirty ggplot - this is just a quick and dirty plot to show what it look
-  # like
-  # At the moment - I thinking the user should make their own
-  # Not a prority for custom plotting functions
-  # SANITY check here and format
-  #--------------------------------------------------------------------------#
-  territories <- check_territory_trial(vesalius_assay, trial)
-  tiles <- get_tiles(vesalius_assay)
-  if (use_image) {
-    img <- vesalius_assay@image
-    if (length(img) == 0) {
-      warning(paste0(
-        "No Image found in ",
-        get_assay_names(vesalius_assay)
-      ))
-      img <- NULL
-    } else {
-      #-------------------------------------------------------------------#
-      # NOTE: not ideal - i made it a list to handle multiple images
-      # will need to think about hwo to handle this data
-      # especially when it comes to interoperable object
-      #-------------------------------------------------------------------#
-      img <- imager::imrotate(img[[1]], 90)
-      img <- as.data.frame(img, wide = "c") %>%
-        mutate(rgb_val = rgb(c.1, c.2, c.3))
-      img$x <- rev(img$x)
-      territories <- adjust_cooridnates(territories, vesalius_assay)
-      # tiles <- adjust_cooridnates(tiles, vesalius_assay)
-    }
-  } else {
-    img <- NULL
-  }
-  #--------------------------------------------------------------------------#
-  # prepaing plot
-  #--------------------------------------------------------------------------#
-  ter_plot <- ggplot()
-  if (!is.null(img)) {
-    ter_plot <- ter_plot + geom_raster(
+    g <- g + geom_raster(
       data = img,
       aes(x = x, y = y, fill = rgb_val)
     ) +
@@ -82,19 +41,15 @@ score_plot <- function(
       scale_y_continuous(expand = c(0, 0)) +
       new_scale("fill")
   }
-
-  ter_plot <- ter_plot +
+  g <- g +
     geom_point(
-      data = territories,
-      aes(x, y, col = trial),
+      data = score,
+      aes(x, y, col = score),
       size = cex_pt,
       alpha = alpha
     )
-  #--------------------------------------------------------------------------#
-  # Checking if need to go spectral or cats
-  #--------------------------------------------------------------------------#
-  if (is(territories$trial, "numeric")) {
-    ter_plot <- ter_plot +
+  if (is.null(bins)) {
+    g <- g +
       scale_colour_gradientn(colours = c(
         "#850101",
         "#cd8878",
@@ -102,12 +57,21 @@ score_plot <- function(
         "#9CAAC4",
         "#1F3B70"
       ))
-  } else {
-    cols <- create_palette(territories, randomise)
-    ter_plot <- ter_plot +
+  } else if (!is.null(bins) && bins == 0) {
+    score$score <- as.factor(score$score)
+    cols <- create_palette(score)
+    g <- g +
       scale_color_manual(values = cols)
+  } else if (!is.null(bins) && bins > 1) {
+    score <- bin_score(score, bins)
+    cols <- create_palette(score)
+    g <- g +
+      scale_color_manual(values = cols)
+  } else {
+    stop("Excuse me? What are you giving to bin? ",
+      "Because it's not a null or numeric")
   }
-  ter_plot <- ter_plot +
+  g <- g +
     theme_classic() +
     theme(
       legend.text = element_text(size = cex * 1.2),
@@ -120,20 +84,44 @@ score_plot <- function(
       override.aes = list(size = cex * 0.3)
     )) +
     labs(
-      colour = legend, title = paste("Vesalius", trial),
-      x = "X coordinates", y = "Y coordinates"
+      colour = "Score", title = targets[3L],
+      x = targets[1L], y = targets[2L]
     )
-  return(ter_plot)
+  return(g)
+
 }
 
 
-#' territories present. If required the colours will be randomly assinged
-#' to each territory. Note that as the territory plot
-#' return a ggplot object, you can easily override the color scheme.
-#' @return color vector
+#' Bin score values into discrete categories
+#'
+#' Converts continuous score values into discrete bins and ranks them.
+#'
+#' @param score Data frame with a "score" column containing numeric values.
+#' @param bins Integer number of bins to create.
+#' @return Data frame with binned and ranked score values.
+bin_score <- function(score, bins) {
+  score$score <- cut(score$score, breaks = bins)
+  ranked <- order(unique(score$score), decreasing = TRUE)
+  locs <- match(score$score, unique(score$score)[ranked])
+  score$score <- locs
+  return(score)
+}
+
+
+
+
+#' Create color palette for scores
+#'
+#' Generates a color palette based on the number of unique score levels.
+#' Uses a predefined color scheme with colors randomly assigned to each
+#' territory. Note that as the territory plot returns a ggplot object,
+#' you can easily override the color scheme.
+#'
+#' @param score Data frame with a "score" column (should be a factor).
+#' @return Character vector of color values.
 #' @importFrom grDevices colorRampPalette
-create_palette <- function(territories, randomise) {
-  ter_col <- length(levels(territories$trial))
+create_palette <- function(score) {
+  ter_col <- length(levels(score$score))
   base_colours <- rev(c(
     "#850101",
     "#cd8878",
@@ -146,27 +134,31 @@ create_palette <- function(territories, randomise) {
   } else {
     ter_pal <- colorRampPalette(base_colours)
   }
-  if (randomise) {
-    ter_col <- sample(ter_pal(ter_col), ter_col)
-  } else {
-    ter_col <- ter_pal(ter_col)
-  }
+  ter_col <- ter_pal(ter_col)
   return(ter_col)
 }
 
 
-#' create alpha value if territories need to be highlighted
-#' @param territories vesalius territories taken from a vesalius_assay
-#' @param highlight numeric vector describing which territories should
-#' be highlighted
-#' @param alpha tranaparent factor
-#' @details If highlight is null, will return the same alpha values
-#' for all territories
-#' @return vector of alpha values
+#' Create alpha values for territory highlighting
+#'
+#' Creates transparency (alpha) values for territories, with optional
+#' highlighting of specific territories.
+#'
+#' @param territories Data frame with a "trial" column containing
+#'   territory assignments.
+#' @param highlight Numeric or character vector describing which
+#'   territories should be highlighted.
+#' @param alpha Numeric transparency factor (default alpha for
+#'   non-highlighted territories is alpha * 0.25).
+#' @details If highlight is NULL, will return the same alpha values
+#'   for all territories.
+#' @return Numeric vector of alpha values matching territories.
 create_alpha <- function(territories, highlight, alpha) {
   if (!is.null(highlight)) {
-    ter_col <- rep(alpha * 0.25, length(levels(territories$trial)))
-    loc <- as.character(levels(territories$trial)) %in% highlight
+    ter_col <- rep(alpha * 0.25,
+      length(levels(territories$trial)))
+    loc <- as.character(levels(territories$trial)) %in%
+      highlight
     ter_col[loc] <- alpha
   } else {
     ter_col <- rep(alpha, length(levels(territories$trial)))
@@ -175,60 +167,62 @@ create_alpha <- function(territories, highlight, alpha) {
 }
 
 
-adjust_cooridnates <- function(trial, vesalius_assay) {
-  orig_coord <- vesalius_assay@meta$orig_coord
-  #-------------------------------------------------------------------------#
-  # First let's split barcodes between adjusted and not
-  #-------------------------------------------------------------------------#
-  adj_barcodes <- grep("_et_", trial$barcodes, value = TRUE)
-  non_adj_barcodes <- trial$barcodes[!trial$barcodes %in% adj_barcodes]
-  #-------------------------------------------------------------------------#
-  # next get original coordinates and match them in trial for non adjusted
-  #-------------------------------------------------------------------------#
-  in_trial <- match(orig_coord$barcodes, non_adj_barcodes) %>%
-    na.exclude()
-  in_orig <- match(non_adj_barcodes, orig_coord$barcodes) %>%
-    na.exclude()
+# adjust_cooridnates <- function(trial, vesalius_assay) {
+#   orig_coord <- vesalius_assay@meta$orig_coord
+#   #-------------------------------------------------------------------------#
+#   # First let's split barcodes between adjusted and not
+#   #-------------------------------------------------------------------------#
+#   adj_barcodes <- grep("_et_", trial$barcodes, value = TRUE)
+#   non_adj_barcodes <- trial$barcodes[!trial$barcodes %in% adj_barcodes]
+#   #-------------------------------------------------------------------------#
+#   # next get original coordinates and match them in trial for non adjusted
+#   #-------------------------------------------------------------------------#
+#   in_trial <- match(orig_coord$barcodes, non_adj_barcodes) %>%
+#     na.exclude()
+#   in_orig <- match(non_adj_barcodes, orig_coord$barcodes) %>%
+#     na.exclude()
 
-  trial$x[in_trial] <- orig_coord$x_orig[in_orig]
-  trial$y[in_trial] <- orig_coord$y_orig[in_orig]
-  #-------------------------------------------------------------------------#
-  # unpack adjusted
-  #-------------------------------------------------------------------------#
-  adj_barcodes_sp <- split(adj_barcodes, "_et_")
-  for (i in seq_along(adj_barcodes_sp)) {
-    x <- orig_coord[
-      orig_coord$barcodes %in% adj_barcodes_sp[[i]],
-      "x_orig"
-    ]
-    y <- orig_coord[
-      orig_coord$barcodes %in% adj_barcodes_sp[[i]],
-      "y_orig"
-    ]
-    trial$x[trial$barcodes == adj_barcodes[i]] <- median(x)
-    trial$y[trial$barcodes == adj_barcodes[i]] <- median(y)
-  }
-  #-------------------------------------------------------------------------#
-  # adjuste using scale - note!!! This is dodgy as fuck!
-  # mainly because my original use of scale was intended to be used this way
-  # Using this like this since it is faster for ad hoc analysis
-  #-------------------------------------------------------------------------#
-  scale <- vesalius_assay@meta$scale$scale
-  trial$x <- trial$x * scale
-  trial$y <- trial$y * scale
-  return(trial)
-}
+#   trial$x[in_trial] <- orig_coord$x_orig[in_orig]
+#   trial$y[in_trial] <- orig_coord$y_orig[in_orig]
+#   #-------------------------------------------------------------------------#
+#   # unpack adjusted
+#   #-------------------------------------------------------------------------#
+#   adj_barcodes_sp <- split(adj_barcodes, "_et_")
+#   for (i in seq_along(adj_barcodes_sp)) {
+#     x <- orig_coord[
+#       orig_coord$barcodes %in% adj_barcodes_sp[[i]],
+#       "x_orig"
+#     ]
+#     y <- orig_coord[
+#       orig_coord$barcodes %in% adj_barcodes_sp[[i]],
+#       "y_orig"
+#     ]
+#     trial$x[trial$barcodes == adj_barcodes[i]] <- median(x)
+#     trial$y[trial$barcodes == adj_barcodes[i]] <- median(y)
+#   }
+#   #-------------------------------------------------------------------------#
+#   # adjuste using scale - note!!! This is dodgy as fuck!
+#   # mainly because my original use of scale was intended to be used this way
+#   # Using this like this since it is faster for ad hoc analysis
+#   #-------------------------------------------------------------------------#
+#   scale <- vesalius_assay@meta$scale$scale
+#   trial$x <- trial$x * scale
+#   trial$y <- trial$y * scale
+#   return(trial)
+# }
 
 
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr mutate
 #' @importFrom tibble rownames_to_column
-#' @importFrom ggplot2 ggplot geom_tile scale_fill_gradientn theme_minimal labs
+#' @importFrom ggplot2 ggplot geom_tile scale_fill_gradientn
+#'   theme_minimal labs
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 view_scores <- function(scores, limits = NULL) {
   scores <- as.data.frame(scores) %>%
-    rownames_to_column(var = "Query") %>% # Move row names into a column called "Query"
+    # Move row names into a column called "Query"
+    rownames_to_column(var = "Query") %>%
     pivot_longer(
       cols = -Query, # Reshape all other columns
       names_to = "Seed",
@@ -243,12 +237,21 @@ view_scores <- function(scores, limits = NULL) {
       limits = limits
     ) + # Adjust color scale
     theme_minimal() +
-    labs(fill = "Score", x = "Seed Territories", y = "Query Territories")
+    labs(
+      fill = "Score",
+      x = "Seed Territories",
+      y = "Query Territories")
   return(g)
 }
 
-#' @importFrom ggplot2 ggplot geom_bar scale_fill_gradientn theme_minimal labs coord_cartesian theme
-#' @importFrom RColorBrewer brewer.pal
+#' Visualize ELO ratings
+#'
+#' Creates a bar plot showing ELO ratings for seed and query groups.
+#'
+#' @param elo_scores List containing "elo_seed" and "elo_query" numeric vectors.
+#' @return A ggplot object showing ELO ratings as bar plots.
+#' @importFrom ggplot2 ggplot geom_bar scale_fill_manual theme_minimal
+#'   labs coord_cartesian theme element_text aes
 #' @export
 view_elo <- function(elo_scores) {
   seed <- elo_scores$elo_seed
@@ -269,20 +272,33 @@ view_elo <- function(elo_scores) {
   g <- ggplot(h, aes(x = Territory, y = ELO, fill = Group)) +
     geom_bar(stat = "identity") +
     coord_cartesian(ylim = c(min(h$ELO) - 10, max(h$ELO))) +
-    scale_fill_manual(values = c("Seed" = "#284259", "Query" = "#f2d99d")) +
+    scale_fill_manual(
+      values = c("Seed" = "#284259", "Query" = "#f2d99d")) +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   return(g)
 }
 
-#' Create color palette to vizualize seed and query scores
+#' Create color palette to visualize seed and query scores
+#'
+#' Generates color palettes for visualizing seed and query groups,
+#' assigning colors based on the union of groups present in both seed
+#' and query.
+#'
+#' @param palette Character vector of base colors to use for palette
+#'   generation.
+#' @param seed Character or numeric vector of seed group identifiers.
+#' @param query Character or numeric vector of query group identifiers.
+#' @return A list with two character vectors: "seed" and "query"
+#'   containing color assignments.
 #' @importFrom grDevices colorRampPalette
 #' @export
 generate_palette <- function(palette, seed, query) {
   pal <- colorRampPalette(palette)
   groups <- sort(union(seed, query), descending = FALSE)
+  n_groups <- length(unique(groups))
   if ("Not Selected" %in% groups) {
-    cols <- pal(length(n_groups) - 1)
+    cols <- pal(n_groups - 1)
     cols <- c(cols, "grey")
   } else {
     cols <- pal(n_groups)

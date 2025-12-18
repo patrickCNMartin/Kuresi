@@ -153,18 +153,32 @@
 # }
 
 #' Create Win/Lose gene list
+#'
+#' Returns predefined lists of "win" and "lose" genes associated with
+#' competitive fitness in cancer cells.
+#'
+#' @return A list containing two character vectors: "win"
+#'   (pro-competitive genes) and "lose" (anti-competitive genes).
 #' @export
 win_lose_genes <- function() {
   win <- toupper(c(
     "Myc", "Mycn", "Cacfd1", "Col17a1", "Yap1", "Taz",
     paste0("Tead", 1:4), "Scrib", paste0("Stat", 1:6), paste0("Jak", 1:3),
-    "Kras", "Hras", "Egfr", "Src", paste0("Bmp", 1:15), "Mtor", "Ppm1d"
+    "Kras", "Hras", "Egfr", "Src",
+    paste0("Bmp", 1:15), "Mtor", "Ppm1d"
   ))
-  lose <- toupper(c("Sparc", paste0("Mapk", 8:10), "Mapk14", "Apc", "Tp53"))
+  lose <- toupper(c(
+    "Sparc", paste0("Mapk", 8:10), "Mapk14", "Apc", "Tp53"))
   return(list("win" = win, "lose" = lose))
 }
 
 #' Create Cancer marker list
+#'
+#' Returns predefined lists of cancer marker genes for specific cancer types.
+#'
+#' @param type Character string specifying cancer type: "pancreas",
+#'   "breast", or "ovary".
+#' @return Character vector of cancer marker gene names.
 #' @export
 cancer_maker_list <- function(type) {
   genes <- switch(type,
@@ -191,6 +205,18 @@ cancer_maker_list <- function(type) {
 
 
 
+#' Generate function based on score type
+#'
+#' Returns an appropriate aggregation function (mean, sum, or Matrix
+#' functions) based on score type and context parameters.
+#'
+#' @param score_type Character string containing "mean" or "sum" to
+#'   specify function type.
+#' @param single Logical whether working with single values
+#'   (default: TRUE).
+#' @param by_territory Logical whether aggregating by territory
+#'   (default: TRUE).
+#' @return A function (mean, sum, Matrix::colMeans, or Matrix::colSums).
 #' @importFrom Matrix rowMeans rowSums colMeans colSums
 function_call <- function(
     score_type,
@@ -204,12 +230,15 @@ function_call <- function(
     fun <- Matrix::colMeans
   } else if (!single && grepl("sum", score_type) && by_territory) {
     fun <- Matrix::colSums
-  } else if (!single && grepl("mean", score_type) && !by_territory) {
+  } else if (!single && grepl("mean", score_type) &&
+    !by_territory) {
     fun <- Matrix::colMeans
-  } else if (!single && grepl("sum", score_type) && !by_territory) {
+  } else if (!single && grepl("sum", score_type) &&
+    !by_territory) {
     fun <- Matrix::colSums
   } else {
-    stop("Cannot generate function from score type and by territory tags")
+    stop("Cannot generate function from score type and by territory",
+      " tags")
   }
   return(fun)
 }

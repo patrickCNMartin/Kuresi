@@ -7,7 +7,8 @@
 \format{
 sparse count matrix
 \describe{
- \item{counts}{gene counts of a 2 cell circle synthetic regime produced oneiric}
+ \item{counts}{gene counts of a 2 cell circle synthetic regime
+   produced oneiric}
 }
 }
 \source{

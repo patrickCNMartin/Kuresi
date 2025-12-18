@@ -7,7 +7,8 @@
 \format{
 coordinate data frame
 \describe{
- \item{coordinates}{spatial coodinates of a 2 cell circle synthetic regime produced oneiric}
+ \item{coordinates}{spatial coordinates of a 2 cell circle synthetic
+   regime produced oneiric}
 }
 }
 \source{

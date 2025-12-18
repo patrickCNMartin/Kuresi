@@ -5,10 +5,11 @@
 #' @keywords datasets
 #' @name coordinates
 #' @usage data(Kuresi)
-#' @source  produced by \url{https://github.com/WonLab-CS/oneiric}
+#' @source produced by \url{https://github.com/WonLab-CS/oneiric}
 #' @format coordinate data frame
 #' \describe{
-#'  \item{coordinates}{spatial coodinates of a 2 cell circle synthetic regime produced oneiric}
+#'  \item{coordinates}{spatial coordinates of a 2 cell circle synthetic
+#'    regime produced oneiric}
 #' }
 #'
 NULL
@@ -21,9 +22,10 @@ NULL
 #' @name counts
 #' @usage data(Kuresi)
 #' @source produced by \url{https://github.com/WonLab-CS/oneiric}
-#' @format  sparse count matrix
+#' @format sparse count matrix
 #' \describe{
-#'  \item{counts}{gene counts of a 2 cell circle synthetic regime produced oneiric}
+#'  \item{counts}{gene counts of a 2 cell circle synthetic regime
+#'    produced oneiric}
 #' }
 #'
 NULL

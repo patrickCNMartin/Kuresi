@@ -6,6 +6,13 @@
 \usage{
 cancer_maker_list(type)
 }
+\arguments{
+\item{type}{Character string specifying cancer type: "pancreas",
+"breast", or "ovary".}
+}
+\value{
+Character vector of cancer marker gene names.
+}
 \description{
-Create Cancer marker list
+Returns predefined lists of cancer marker genes for specific cancer types.
 }

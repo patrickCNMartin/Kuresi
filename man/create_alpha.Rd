@@ -2,25 +2,28 @@
 % Please edit documentation in R/viz_utils.r
 \name{create_alpha}
 \alias{create_alpha}
-\title{create alpha value if territories need to be highlighted}
+\title{Create alpha values for territory highlighting}
 \usage{
 create_alpha(territories, highlight, alpha)
 }
 \arguments{
-\item{territories}{vesalius territories taken from a vesalius_assay}
+\item{territories}{Data frame with a "trial" column containing
+territory assignments.}
 
-\item{highlight}{numeric vector describing which territories should 
-be highlighted}
+\item{highlight}{Numeric or character vector describing which
+territories should be highlighted.}
 
-\item{alpha}{tranaparent factor}
+\item{alpha}{Numeric transparency factor (default alpha for
+non-highlighted territories is alpha * 0.25).}
 }
 \value{
-vector of alpha values
+Numeric vector of alpha values matching territories.
 }
 \description{
-create alpha value if territories need to be highlighted
+Creates transparency (alpha) values for territories, with optional
+highlighting of specific territories.
 }
 \details{
-If highlight is null, will return the same alpha values 
-for all territories
+If highlight is NULL, will return the same alpha values
+  for all territories.
 }

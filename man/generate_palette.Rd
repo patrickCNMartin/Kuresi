@@ -2,10 +2,24 @@
 % Please edit documentation in R/viz_utils.r
 \name{generate_palette}
 \alias{generate_palette}
-\title{Create color palette to vizualize seed and query scores}
+\title{Create color palette to visualize seed and query scores}
 \usage{
 generate_palette(palette, seed, query)
 }
+\arguments{
+\item{palette}{Character vector of base colors to use for palette
+generation.}
+
+\item{seed}{Character or numeric vector of seed group identifiers.}
+
+\item{query}{Character or numeric vector of query group identifiers.}
+}
+\value{
+A list with two character vectors: "seed" and "query"
+  containing color assignments.
+}
 \description{
-Create color palette to vizualize seed and query scores
+Generates color palettes for visualizing seed and query groups,
+assigning colors based on the union of groups present in both seed
+and query.
 }
