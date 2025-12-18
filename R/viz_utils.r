@@ -1,3 +1,24 @@
+score_plot <- function(score,
+                       cex = 10,
+                       alpha = 0.65,
+                       bin = NULL,
+                       img = NULL) {
+  g <- ggplot()
+  if (!is.null(img) && is(img, "imager")) {
+    img <- as.data.frame(img, wide = "c") %>%
+        mutate(rgb_val = rgb(c.1, c.2, c.3))
+      img$x <- rev(img$x)
+  }
+
+
+}
+
+
+
+
+
+
+
 #' @export
 #' @importFrom ggplot2 ggplot geom_point aes facet_wrap theme_classic
 #' @importFrom ggplot2 scale_color_manual theme element_text scale_colour_gradientn

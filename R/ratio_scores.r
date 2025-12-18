@@ -56,7 +56,6 @@ compute_ratio_score <- function(
     center = FALSE,
     collapse = FALSE,
     verbose = TRUE) {
-  simple_bar(verbose)
   #-------------------------------------------------------------------------#
   # checks
   #-------------------------------------------------------------------------#

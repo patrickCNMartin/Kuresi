@@ -5,7 +5,8 @@ k_wilcox <- function(s_counts, q_counts, genes) {
     seq(1, nrow(s_counts)), function(idx, s_counts, q_counts) {
       return(
         suppressWarnings(
-          wilcox.test(as.vector(s_counts[idx, ]),as.vector(q_counts[idx, ]))$p.value
+          wilcox.test(as.vector(s_counts[idx, ]),
+                      as.vector(q_counts[idx, ]))$p.value
         )
       )
     },

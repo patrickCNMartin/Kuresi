@@ -14,6 +14,8 @@
         rpkgs = builtins.attrValues {
           inherit (pkgs.rPackages)
             devtools
+            dplyr
+            tidyr
             ggplot2
             ggpubr
             hdf5r
