@@ -15,11 +15,13 @@
           inherit (pkgs.rPackages)
             devtools
             dplyr
-            tidyr
+            future
+            future_apply
             ggplot2
             ggpubr
             hdf5r
             knitr
+            imager
             lintr
             Matrix
             patchwork
@@ -32,7 +34,8 @@
             RUnit
             Seurat
             styler
-            testthat;
+            testthat
+            tidyr;
         };
 
         Vesalius = (pkgs.rPackages.buildRPackage {
