@@ -20,7 +20,7 @@ Kuresi analyzes competition between cancer cell populations by comparing express
 
 ```r
 # Install from source
-devtools::install_github("your-repo/Kuresi")
+devtools::install_github("patrickCNMartin/Kuresi")
 ```
 
 ## Quick Start
@@ -71,11 +71,6 @@ view_elo(elo_ratings)
 - `view_scores()`: Heatmap visualization of score matrices
 - `view_elo()`: Bar plot of ELO ratings
 
-## Citation
-
-If you use Kuresi in your research, please cite:
-
-Patrick C.N. Martin (2024). Kuresi: Competitive fitness of Cancer clones. R package version 0.0.1.
 
 ## License
 

@@ -3,5 +3,5 @@
 **/.DS_Store
 
 
-# Any R files should the not be removed
+# 
 .Rprofile
