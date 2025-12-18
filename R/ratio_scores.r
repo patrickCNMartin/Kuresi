@@ -23,16 +23,20 @@ compute_ratio_bygroup <- function(
                                   cells = group_id[[g]]$cell_id,
                                   genes_1 = genes_1,
                                   genes_2 = genes_2,
-                                  method = method,
+                                  method = method[1L],
                                   weights_1 = weights_1,
                                   weights_2 = weights_2,
                                   scale = scale,
                                   center = center,
                                   collapse = TRUE,
-                                  verbose = TRUE)
-    groups[[g]]$score <- scores
+                                  verbose = verbose)
+    rownames(group_id[[g]]) <- group_id[[g]]$cell_id
+    group_id[[g]]$score <- scores
   }
-  groups <- do.call("rbind", groups)
+  group_id <- do.call("rbind", group_id)
+  group_id <- group_id[match(group_id$cell_id, rownames(groups)), "score"]
+  groups$score <- group_id
+  colnames(groups) <- gsub("score", method[1L], colnames(groups))
   return(groups)
 }
 

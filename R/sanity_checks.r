@@ -14,7 +14,7 @@ validate_input <- function(
     !is(counts, "RsparseMatrix") &&
     !is(counts, "TsparseMatrix") &&
     !is(counts, "data.frame")) {
-    stop("Type Error: Counts is not a matrix or sparse matrix!")
+    stop("Counts is not a matrix or sparse matrix!")
   }
   #-------------------------------------------------------------------------#
   # check cells
