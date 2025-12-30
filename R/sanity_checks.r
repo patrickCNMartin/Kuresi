@@ -68,7 +68,7 @@ validate_input <- function(
     stop("Please provide at least one gene group - parse to genes_1")
   }
   if (!is.null(genes_2)) {
-    g_2 <- genes_2[genes_2 %in% colnames(counts)]
+    g_2 <- genes_2[genes_2 %in% rownames(counts)]
     if (length(g_2) == 0) {
       stop("No genes provided are present in count matrix")
     }

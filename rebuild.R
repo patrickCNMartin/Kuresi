@@ -38,3 +38,19 @@ message('Successfully removed, rebuilt, re-installed and reloaded Kuresi')
 
 #message('Generating vignette Kuresi')
 #rmarkdown::render('Kuresi/vignettes/Kuresi', 'html_document')
+
+
+ter1 <- coord$barcodes[coord$cell_labels %in% c(1.0, 1.1)]
+c1 <- log2(as.matrix(counts[, ter1]) + 1)
+ter2 <- coord$barcodes[!coord$cell_labels %in% c(1.0, 1.1)]
+c2 <- log2(as.matrix(counts[, ter2]) + 1)
+
+test <- Kuresi:::k_wilcox(c1,c2)
+test <- test[test$p_value_adj < 0.05 &
+             test$fold_change > 0.5 |
+             test$fold_change < -0.5,]
+gene_set <- test$genes[order(test$fold_change, decreasing = TRUE)]
+gene_set1 <- head(gene_set)
+gene_set2 <- tail(gene_set)
+rownames(coord) <- coord$barcodes
+ratio <- compute_ratio_bygroup(counts,coord,"cell_labels", gene_set1,gene_set2) 

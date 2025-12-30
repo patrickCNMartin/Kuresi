@@ -1,7 +1,10 @@
 Package: Kuresi
 Type: Package
 Title: Competitive fitness of Cancer clones
-Authors: Patrick C.N. Martin <patrick.martin@cshs.org>
+Description: Kuresi is an R package for analyzing competitive 
+  fitness between cancer clones in single cell and spatial transcriptomics data. 
+  It provides tools to compute and visualize competition scores based on differential gene expression patterns.
+Author: Patrick C.N. Martin <patrick.martin@cshs.org>
 Version: 0.0.1
 Maintainer: Patrick C.N. Martin <patrick.martin@cshs.org>
 License: GPL-3 + file LICENSE
@@ -23,7 +26,12 @@ Imports: grDevices,
   Matrix,
   hdf5r,
   Seurat,
-  RColorBrewer
+  RColorBrewer,
+  dplyr,
+  ggnewscale,
+  pwr,
+  tibble,
+  tidyr
 Suggests: knitr,
   RUnit,
   rmarkdown,

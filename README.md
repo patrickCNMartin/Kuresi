@@ -2,7 +2,7 @@
 
 **Competitive fitness of Cancer clones**
 
-Kuresi is an R package for analyzing competitive fitness between cancer clones in spatial transcriptomics data. It provides tools to compute and visualize competition scores based on differential gene expression patterns.
+Kuresi is an R package for analyzing competitive fitness between cancer clones in single cell and spatial transcriptomics data. It provides tools to compute and visualize competition scores based on differential gene expression patterns.
 
 ## Overview
 
@@ -18,10 +18,20 @@ Kuresi analyzes competition between cancer cell populations by comparing express
 
 ## Installation
 
+### From GitHub
+
 ```r
-# Install from source
 devtools::install_github("patrickCNMartin/Kuresi")
 ```
+### From tarball
+
+First, download `Kuresi_0.0.1.tar.gz` available in the root of this repository. Move the tarball to your desired location, and make
+sure you are in that directory within R, then:
+
+```r
+install.packages("Kuresi_0.0.1.tar.gz", repo = NULL)
+```
+
 
 ## Quick Start
 

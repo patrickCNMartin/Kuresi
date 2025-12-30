@@ -1,0 +1,57 @@
+
+R version 4.4.3 (2025-02-28) -- "Trophy Case"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin24.6.0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(testthat)
+> library(Kuresi)
+> 
+> test_check("Kuresi")
+[ FAIL 4 | WARN 0 | SKIP 0 | PASS 43 ]
+
+══ Failed tests ════════════════════════════════════════════════════════════════
+── Error ('test_ratio_scores.r:11:3'): compute_ratio_score works with simple input ──
+Error in `validate_input(counts, cells, genes_1, genes_2, method, weights_1, 
+    weights_2)`: No genes provided are present in count matrix
+Backtrace:
+    ▆
+ 1. └─Kuresi::compute_ratio_score(...) at test_ratio_scores.r:11:3
+ 2.   └─Kuresi:::validate_input(...)
+── Error ('test_ratio_scores.r:56:5'): compute_ratio_score works with different methods ──
+Error in `validate_input(counts, cells, genes_1, genes_2, method, weights_1, 
+    weights_2)`: No genes provided are present in count matrix
+Backtrace:
+    ▆
+ 1. └─Kuresi::compute_ratio_score(...) at test_ratio_scores.r:56:5
+ 2.   └─Kuresi:::validate_input(...)
+── Error ('test_ratio_scores.r:83:3'): compute_ratio_bygroup works ─────────────
+Error in `validate_input(counts, cells, genes_1, genes_2, method, weights_1, 
+    weights_2)`: No genes provided are present in count matrix
+Backtrace:
+    ▆
+ 1. └─Kuresi::compute_ratio_bygroup(...) at test_ratio_scores.r:83:3
+ 2.   └─Kuresi::compute_ratio_score(...)
+ 3.     └─Kuresi:::validate_input(...)
+── Error ('test_viz_utils.r:34:3'): generate_palette works ─────────────────────
+Error in `sort.int(x, na.last = na.last, decreasing = decreasing, ...)`: unused argument (descending = FALSE)
+Backtrace:
+    ▆
+ 1. └─Kuresi::generate_palette(palette, seed, query) at test_viz_utils.r:34:3
+ 2.   ├─base::sort(union(seed, query), descending = FALSE)
+ 3.   └─base::sort.default(union(seed, query), descending = FALSE)
+
+[ FAIL 4 | WARN 0 | SKIP 0 | PASS 43 ]
+Error: Test failures
+Execution halted

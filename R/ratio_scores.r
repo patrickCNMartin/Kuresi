@@ -43,7 +43,7 @@ compute_ratio_bygroup <- function(
   #-------------------------------------------------------------------------#
   group_id <- check_grouping(groups, group_name)
   group_id <- split(group_id, group_id[, "group_id"])
- 
+
   for (g in seq_along(group_id)) {
     scores <- compute_ratio_score(
       counts,

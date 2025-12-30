@@ -41,15 +41,14 @@ score_plot <- function(score,
       scale_y_continuous(expand = c(0, 0)) +
       new_scale("fill")
   }
-  g <- g +
-    geom_point(
-      data = score,
-      aes(x, y, col = score),
-      size = cex_pt,
-      alpha = alpha
-    )
+  
   if (is.null(bins)) {
     g <- g +
+    geom_point(
+      data = score,
+      aes(x, y, col = as.numeric(score)),
+      size = cex_pt,
+      alpha = alpha)+
       scale_colour_gradientn(colours = c(
         "#850101",
         "#cd8878",
@@ -61,11 +60,22 @@ score_plot <- function(score,
     score$score <- as.factor(score$score)
     cols <- create_palette(score)
     g <- g +
+      geom_point(
+        data = score,
+        aes(x, y, col = score),
+        size = cex_pt,
+        alpha = alpha) +
       scale_color_manual(values = cols)
   } else if (!is.null(bins) && bins > 1) {
+    score$score <- as.factor(score$score)
     score <- bin_score(score, bins)
     cols <- create_palette(score)
     g <- g +
+      geom_point(
+        data = score,
+        aes(x, y, col = score),
+        size = cex_pt,
+        alpha = alpha) +
       scale_color_manual(values = cols)
   } else {
     stop("Excuse me? What are you giving to bin? ",
