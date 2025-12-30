@@ -3,7 +3,8 @@
 **/.DS_Store
 
 
-# 
+# r stuff
 .Rprofile
 
-.Rcheck
+# build and checks
+Kuresi.Rcheck
