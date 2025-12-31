@@ -78,46 +78,7 @@
               TreeDist;
           };
         });
-        Oneiric = (pkgs.rPackages.buildRPackage {
-          name = "Oneiric";
-          src = pkgs.fetchgit {
-            url = "https://github.com/WonLab-CS/oneiric";
-            rev = "7320f83";
-          };
-          propagatedBuildInputs = builtins.attrValues {
-            inherit (pkgs.rPackages)
-              deldir
-              sp
-              tvR
-              Matrix
-              RColorBrewer
-              future
-              future_apply
-              imagerExtra
-              Signac
-              ggpubr
-              lmtest
-              infix
-              Seurat
-              SeuratObject
-              imager
-              DESeq2
-              RANN
-              dplyr
-              edgeR
-              ggplot2
-              igraph
-              pwr
-              purrr
-              patchwork
-              ggnewscale
-              kohonen
-              Rcpp
-              RcppEigen
-              TreeDist;
-          };
-        });
-
+        
         system_packages = builtins.attrValues {
           inherit (pkgs)
             glibcLocales
