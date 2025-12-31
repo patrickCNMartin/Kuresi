@@ -16,6 +16,7 @@
 #'   (optional).
 #' @details Modifies variables in the parent frame using assign().
 #' @return Returns 0 on success, stops with error if validation fails.
+#' @importFrom methods is
 validate_input <- function(
     counts,
     cells,
@@ -123,13 +124,13 @@ validate_input <- function(
     stop("Method provided not in available methods: ",
       "mean_ratio, mean_sub, sum_ratio, sum_sub")
   }
-  assign("counts", counts, env = parent.frame())
-  assign("cells", c_1, env = parent.frame())
-  assign("genes_1", g_1, env = parent.frame())
-  assign("genes_2", g_2, env = parent.frame())
-  assign("weights_1", weights_1_pad, env = parent.frame())
-  assign("weights_2", weights_2_pad, env = parent.frame())
-  assign("method", method[1L], env = parent.frame())
+  assign("counts", counts, envir = parent.frame())
+  assign("cells", c_1, envir = parent.frame())
+  assign("genes_1", g_1, envir = parent.frame())
+  assign("genes_2", g_2, envir = parent.frame())
+  assign("weights_1", weights_1_pad, envir = parent.frame())
+  assign("weights_2", weights_2_pad, envir = parent.frame())
+  assign("method", method[1L], envir = parent.frame())
   return(0)
 }
 
@@ -142,7 +143,9 @@ validate_input <- function(
 #'   assignments.
 #' @param group_name Character string specifying column name if group_id
 #'   is a data frame.
+#' @importFrom methods is
 #' @return Data frame with columns "cell_id" and "group_id".
+#' @importFrom methods is
 check_grouping <- function(group_id, group_name) {
   if (is(group_id, "data.frame") || is(group_id,"matrix")) {
     if (is.null(group_name)) {

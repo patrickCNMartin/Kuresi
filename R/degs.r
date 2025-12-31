@@ -12,9 +12,11 @@
 #'   fold_change, effect_size.
 #' @importFrom Matrix rowMeans
 #' @importFrom stats wilcox.test p.adjust
-k_wilcox <- function(s_counts, q_counts, genes) {
+k_wilcox <- function(s_counts, q_counts, genes = NULL) {
   fc <- rowMeans(s_counts) - rowMeans(q_counts)
-  genes <- rownames(s_counts)
+  if (is.null(genes)) {
+    genes <- rownames(s_counts)
+  }
   p_val <- sapply(
     seq(1, nrow(s_counts)), function(idx, s_counts, q_counts) {
       return(
@@ -54,9 +56,11 @@ k_wilcox <- function(s_counts, q_counts, genes) {
 #'   fold_change, effect_size.
 #' @importFrom Matrix rowMeans
 #' @importFrom stats t.test p.adjust
-k_ttest <- function(s_counts, q_counts, genes) {
+k_ttest <- function(s_counts, q_counts, genes = NULL) {
   fc <- rowMeans(s_counts) - rowMeans(q_counts)
-  genes <- rownames(s_counts)
+  if (is.null(genes)) {
+    genes <- rownames(s_counts)
+  }
   p_val <- sapply(
     seq(1, nrow(s_counts)), function(idx, s_counts, q_counts) {
       return(

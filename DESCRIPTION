@@ -18,25 +18,21 @@ Collate: competition_score.r
 Depends: R (>= 4.0.0)
 Imports: grDevices,
   stats,
-  utils,
   ggplot2,
-  patchwork,
-  ggpubr,
-  rjson,
   Matrix,
-  hdf5r,
-  Seurat,
   RColorBrewer,
   dplyr,
   ggnewscale,
   pwr,
   tibble,
-  tidyr
+  tidyr,
+  methods
 Suggests: knitr,
   RUnit,
   rmarkdown,
   testthat (>= 3.0.0)   
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 VignetteBuilder: knitr
 RoxygenNote: 7.3.3

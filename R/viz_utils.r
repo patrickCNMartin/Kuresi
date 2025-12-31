@@ -18,7 +18,9 @@
 #'   scale_x_continuous scale_y_continuous aes
 #' @importFrom ggnewscale new_scale
 #' @importFrom dplyr mutate
+#' @importFrom dplyr %>%
 #' @importFrom grDevices rgb
+#' @importFrom methods is
 score_plot <- function(score,
                        cex = 10,
                        cex_pt = 1,
@@ -67,8 +69,8 @@ score_plot <- function(score,
         alpha = alpha) +
       scale_color_manual(values = cols)
   } else if (!is.null(bins) && bins > 1) {
-    score$score <- as.factor(score$score)
     score <- bin_score(score, bins)
+    score$score <- as.factor(score$score)
     cols <- create_palette(score)
     g <- g +
       geom_point(
@@ -222,8 +224,19 @@ create_alpha <- function(territories, highlight, alpha) {
 # }
 
 
+#' Visualize competition score matrix
+#'
+#' Creates a heatmap visualization of a competition score matrix, showing
+#' scores between seed and query groups as a color-coded tile plot.
+#'
+#' @param scores A matrix or data frame with competition scores, where rows
+#'   represent query groups and columns represent seed groups.
+#' @param limits Optional numeric vector of length 2 specifying the color
+#'   scale limits (default: NULL, uses data range).
+#' @return A ggplot object showing the score matrix as a heatmap.
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr mutate
+#' @importFrom dplyr %>%
 #' @importFrom tibble rownames_to_column
 #' @importFrom ggplot2 ggplot geom_tile scale_fill_gradientn
 #'   theme_minimal labs
@@ -305,7 +318,7 @@ view_elo <- function(elo_scores) {
 #' @export
 generate_palette <- function(palette, seed, query) {
   pal <- colorRampPalette(palette)
-  groups <- sort(union(seed, query), descending = FALSE)
+  groups <- sort(union(seed, query), decreasing = FALSE)
   n_groups <- length(unique(groups))
   if ("Not Selected" %in% groups) {
     cols <- pal(n_groups - 1)

@@ -1,5 +1,7 @@
 # Kuresi
 
+[![R-CMD-check](https://github.com/patrickCNMartin/Kuresi/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/patrickCNMartin/Kuresi/actions/workflows/R-CMD-check.yml)
+
 **Competitive fitness of Cancer clones**
 
 Kuresi is an R package for analyzing competitive fitness between cancer clones in single cell and spatial transcriptomics data. It provides tools to compute and visualize competition scores based on differential gene expression patterns.

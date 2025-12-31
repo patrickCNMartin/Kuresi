@@ -191,8 +191,9 @@ outcomes_as_elo <- function(
       for (j in seq_len(nrow(scores))) {
         local_seed_rating <- elo_seed[i]
         local_query_rating <- elo_query[j]
-        local_scores <- ifelse(
-          scores[j, i] == 0.5, 0.5, round(scores[j, i]))
+        local_scores <- ifelse(scores[j, i] == 0.5,
+                               0.5,
+                               round(scores[j, i]))
         compute_elo(local_seed_rating, local_query_rating, local_scores)
         elo_seed[i] <- local_seed_rating
         elo_query[j] <- local_query_rating
@@ -231,8 +232,8 @@ compute_elo <- function(
     k * (outcome_query - expected_query)
   assign("local_seed_rating",
          round(new_local_seed_rating),
-         env = parent.frame())
+         envir = parent.frame())
   assign("local_query_rating",
          round(new_local_query_rating),
-         env = parent.frame())
+         envir = parent.frame())
 }

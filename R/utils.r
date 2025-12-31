@@ -642,3 +642,8 @@ function_call <- function(
 #   )
 #   return(list("assay" = new_assay, "seed" = seed, "query" = query))
 # }
+
+
+#----------------------------/Global bindings/---------------------------------#
+utils::globalVariables(c("x", "y", "c.1", "c.2", "c.3", "rgb_val",
+  "Territory", "ELO", "Group", "Query", "Seed", "Score"))
