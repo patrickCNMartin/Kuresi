@@ -4,7 +4,7 @@
 \alias{k_wilcox}
 \title{Perform Wilcoxon rank-sum test for differential expression}
 \usage{
-k_wilcox(s_counts, q_counts, genes)
+k_wilcox(s_counts, q_counts, genes = NULL)
 }
 \arguments{
 \item{s_counts}{Matrix or sparse matrix of counts for seed/reference

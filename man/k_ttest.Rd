@@ -4,7 +4,7 @@
 \alias{k_ttest}
 \title{Perform t-test for differential expression}
 \usage{
-k_ttest(s_counts, q_counts, genes)
+k_ttest(s_counts, q_counts, genes = NULL)
 }
 \arguments{
 \item{s_counts}{Matrix or sparse matrix of counts for seed/reference

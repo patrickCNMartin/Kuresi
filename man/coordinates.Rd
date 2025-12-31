@@ -3,6 +3,7 @@
 \docType{data}
 \name{coordinates}
 \alias{coordinates}
+\alias{coord}
 \title{Spatial coordinates}
 \format{
 coordinate data frame
