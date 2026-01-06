@@ -1,2 +1,9 @@
 ^\.envrc$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
 
+^\.github$
+^flake\.nix$
+^flake\.lock$
+^rebuild\.R$
