@@ -1,12 +1,15 @@
 ---
-title: "Kuresi Vignette"
+title: "Kuresi: Quick Start"
 author: "Patrick C.N. Martin"
 date: "`r Sys.Date()`"
-output: 
-    pdf_document
-    html_document
+output:
+  - rmarkdown::html_vignette
+  - rmarkdown::pdf_vignette
+vignette: >
+  %\VignetteIndexEntry{Kuresi: Quick Start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-
 
 ```{r setup, eval = TRUE, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)

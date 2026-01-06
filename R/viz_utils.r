@@ -326,7 +326,9 @@ generate_palette <- function(palette, seed, query) {
   } else {
     cols <- pal(n_groups)
   }
-  seed_colors <- cols[match(groups, unique(seed))]
-  query_colors <- cols[match(groups, unique(query))]
+  seed_colors <- match(groups, unique(seed))
+  seed_colors <- cols[!is.na(seed_colors)]
+  query_colors <- match(groups, unique(query))
+  query_colors <- cols[!is.na(query_colors)]
   return(list("seed" = seed_colors, "query" = query_colors))
 }
