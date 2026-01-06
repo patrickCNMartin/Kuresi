@@ -1,6 +1,6 @@
 # Kuresi
 
-[![R-CMD-check](https://github.com/patrickCNMartin/Kuresi/.github/workflows/R-CMD-check.yml/badge.svg)](https://github.com/patrickCNMartin/Kuresi/.github/workflows/R-CMD-check.yml)
+![R-CMD-check](https://github.com/patrickCNMartin/Kuresi/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)
 
 **Competitive fitness of Cancer clones**
 
