@@ -187,8 +187,9 @@ check_gene_set <- function(counts, genes){
       stop("No genes provided are present in count matrix")
     }
     if (length(gs) < length(genes)) {
+      missing <- genes[!genes %in% gs]
       warning(paste0(
-        paste0(!genes %in% gs, sep = " ", collapse = " "),
+        paste0(missing, sep = " ", collapse = " "),
         " are not present in count matrix"))
     }
     return(gs)
