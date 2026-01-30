@@ -21,6 +21,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom grDevices rgb
 #' @importFrom methods is
+#' @export
 score_plot <- function(score,
                        cex = 10,
                        cex_pt = 1,
@@ -67,7 +68,10 @@ score_plot <- function(score,
         aes(x, y, col = score),
         size = cex_pt,
         alpha = alpha) +
-      scale_color_manual(values = cols)
+      scale_color_manual(values = cols)+
+    guides(colour = guide_legend(
+      override.aes = list(size = cex * 0.3)
+    ))
   } else if (!is.null(bins) && bins > 1) {
     score <- bin_score(score, bins)
     score$score <- as.factor(score$score)
@@ -78,7 +82,10 @@ score_plot <- function(score,
         aes(x, y, col = score),
         size = cex_pt,
         alpha = alpha) +
-      scale_color_manual(values = cols)
+      scale_color_manual(values = cols) +
+    guides(colour = guide_legend(
+      override.aes = list(size = cex * 0.3)
+    ))
   } else {
     stop("Excuse me? What are you giving to bin? ",
       "Because it's not a null or numeric")
@@ -92,9 +99,6 @@ score_plot <- function(score,
       plot.title = element_text(size = cex * 1.5),
       legend.title = element_text(size = cex * 1.2)
     ) +
-    guides(colour = guide_legend(
-      override.aes = list(size = cex * 0.3)
-    )) +
     labs(
       colour = "Score", title = targets[3L],
       x = targets[1L], y = targets[2L]
@@ -113,9 +117,10 @@ score_plot <- function(score,
 #' @return Data frame with binned and ranked score values.
 bin_score <- function(score, bins) {
   score$score <- cut(score$score, breaks = bins)
-  ranked <- order(unique(score$score), decreasing = TRUE)
-  locs <- match(score$score, unique(score$score)[ranked])
-  score$score <- locs
+  #ranked <- sort(unique(score$score), decreasing = FALSE)
+  #locs <- match(score$score, unique(score$score)[ranked])
+  #score$score <- locs
+  
   return(score)
 }
 
