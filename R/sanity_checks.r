@@ -56,28 +56,12 @@ validate_input <- function(
   # check genes
   #-------------------------------------------------------------------------#
   if (!is.null(genes_1)) {
-    g_1 <- genes_1[genes_1 %in% rownames(counts)]
-    if (length(g_1) == 0) {
-      stop("No genes provided are present in count matrix")
-    }
-    if (length(g_1) < length(genes_1)) {
-      warning(paste0(
-        paste0(!genes_1 %in% g_1, sep = " ", collapse = " "),
-        " are not present in count matrix"))
-    }
+    g_1 <- check_gene_set(counts, genes_1)
   } else {
     stop("Please provide at least one gene group - parse to genes_1")
   }
   if (!is.null(genes_2)) {
-    g_2 <- genes_2[genes_2 %in% rownames(counts)]
-    if (length(g_2) == 0) {
-      stop("No genes provided are present in count matrix")
-    }
-    if (length(g_2) < length(genes_2)) {
-      warning(paste0(
-        paste0(!genes_2 %in% g_2, sep = " ", collapse = " "),
-        " are not present in count matrix"))
-    }
+    g_2 <- check_gene_set(counts, genes_2)
   } else {
     g_2 <- g_1
   }
