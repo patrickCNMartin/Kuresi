@@ -20,6 +20,8 @@
 #'   (optional).
 #' @param scale Logical whether to scale counts (default: FALSE).
 #' @param center Logical whether to center scores (default: FALSE).
+#' @param raw logical wether to return raw score -
+#' center must be set to FALSE - otherwise min/max norm scores (default: FALSE).
 #' @param rank logical wether to use score rank (default: FALSE).
 #' @param add_name Character string to add to output column name
 #'   (optional).
@@ -110,7 +112,8 @@ compute_ratio_bygroup <- function(
 #' @param scale Logical whether to scale counts before computing scores
 #'   (default: FALSE).
 #' @param center Logical whether to center scores (default: FALSE).
-#' @param raw Logical whether to return raw uncentered scores (default: FALSE).
+#' @param raw Logical whether to return raw uncentered scores
+#' center must be set to FALSE (default: FALSE).
 #' @param collapse Logical whether to return a single aggregated value
 #'   instead of per-cell scores (default: FALSE).
 #' @param verbose Logical whether to print progress messages

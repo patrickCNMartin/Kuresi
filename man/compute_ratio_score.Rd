@@ -14,6 +14,7 @@ compute_ratio_score(
   weights_2 = NULL,
   scale = FALSE,
   center = FALSE,
+  raw = FALSE,
   collapse = FALSE,
   verbose = TRUE
 )
@@ -43,6 +44,9 @@ all cells if NULL).}
 (default: FALSE).}
 
 \item{center}{Logical whether to center scores (default: FALSE).}
+
+\item{raw}{Logical whether to return raw uncentered scores
+center must be set to FALSE (default: FALSE).}
 
 \item{collapse}{Logical whether to return a single aggregated value
 instead of per-cell scores (default: FALSE).}

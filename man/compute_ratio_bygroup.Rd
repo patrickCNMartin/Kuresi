@@ -15,6 +15,8 @@ compute_ratio_bygroup(
   weights_2 = NULL,
   scale = FALSE,
   center = FALSE,
+  raw = FALSE,
+  rank = FALSE,
   add_name = NULL,
   verbose = TRUE
 )
@@ -46,6 +48,11 @@ groups if groups is a data frame.}
 \item{scale}{Logical whether to scale counts (default: FALSE).}
 
 \item{center}{Logical whether to center scores (default: FALSE).}
+
+\item{raw}{logical wether to return raw score -
+center must be set to FALSE - otherwise min/max norm scores (default: FALSE).}
+
+\item{rank}{logical wether to use score rank (default: FALSE).}
 
 \item{add_name}{Character string to add to output column name
 (optional).}
