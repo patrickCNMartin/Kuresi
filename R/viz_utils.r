@@ -52,13 +52,13 @@ score_plot <- function(score,
       aes(x, y, col = as.numeric(score)),
       size = cex_pt,
       alpha = alpha)+
-      scale_colour_gradientn(colours = c(
+      scale_colour_gradientn(colours = rev(c(
         "#850101",
         "#cd8878",
         "#f1f1b1",
         "#9CAAC4",
         "#1F3B70"
-      ))
+      )))
   } else if (!is.null(bins) && bins == 0) {
     score$score <- as.factor(score$score)
     cols <- create_palette(score)

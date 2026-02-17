@@ -20,6 +20,7 @@
 #'   (optional).
 #' @param scale Logical whether to scale counts (default: FALSE).
 #' @param center Logical whether to center scores (default: FALSE).
+#' @param rank logical wether to use score rank (default: FALSE).
 #' @param add_name Character string to add to output column name
 #'   (optional).
 #' @param verbose Logical whether to print progress messages (default: TRUE).
@@ -36,6 +37,8 @@ compute_ratio_bygroup <- function(
     weights_2 = NULL,
     scale = FALSE,
     center = FALSE,
+    raw = FALSE,
+    rank = FALSE,
     add_name = NULL,
     verbose = TRUE) {
   #-------------------------------------------------------------------------#
@@ -54,14 +57,30 @@ compute_ratio_bygroup <- function(
       weights_1 = weights_1,
       weights_2 = weights_2,
       scale = scale,
-      center = center,
+      center = FALSE,
+      raw = TRUE,
       collapse = TRUE,
       verbose = verbose)
     rownames(group_id[[g]]) <- group_id[[g]]$cell_id
     group_id[[g]]$score <- scores
   }
+  #-------------------------------------------------------------------------#
+  # Compute global metrics after computing per grouping scores
+  #-------------------------------------------------------------------------#
   group_id <- do.call("rbind", group_id)
-  group_id <- group_id[match(group_id$cell_id, rownames(groups)), "score"]
+  if (center && grepl("mean", method[1L])) {
+    group_id$score <- group_id$score - 1
+  } else if (center && grepl("sub", method[1L])) {
+    group_id$score <- group_id$score - min(group_id$score)
+  } else if (!center && !raw) {
+    group_id$score <- (group_id$score - min(group_id$score)) / (
+      max(group_id$score) - min(group_id$score))
+  }
+  if (rank) {
+    ord <- sort(unique(group_id$score), decreasing = TRUE)
+    group_id$score <- match(group_id$score, ord)
+  }
+  group_id <- group_id[match(rownames(groups), group_id$cell_id), "score"]
   groups$score <- group_id
   colnames(groups) <- gsub("score", method[1L], colnames(groups))
   return(groups)
@@ -91,6 +110,7 @@ compute_ratio_bygroup <- function(
 #' @param scale Logical whether to scale counts before computing scores
 #'   (default: FALSE).
 #' @param center Logical whether to center scores (default: FALSE).
+#' @param raw Logical whether to return raw uncentered scores (default: FALSE).
 #' @param collapse Logical whether to return a single aggregated value
 #'   instead of per-cell scores (default: FALSE).
 #' @param verbose Logical whether to print progress messages
@@ -108,6 +128,7 @@ compute_ratio_score <- function(
     weights_2 = NULL,
     scale = FALSE,
     center = FALSE,
+    raw = FALSE,
     collapse = FALSE,
     verbose = TRUE) {
   #-------------------------------------------------------------------------#
@@ -139,10 +160,11 @@ compute_ratio_score <- function(
     score <- score - 1
   } else if (center && grepl("sub", method[1L])) {
     score <- score - min(score)
-  } else {
+  } else if (!center && !raw){
     score <- (score - min(score)) / (
       max(score) - min(score))
   }
+  
   #-------------------------------------------------------------------------#
   # If collapse is TRUE we take the mean or sum across all cells and
   # return a single value, otherwise by individual cells
