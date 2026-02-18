@@ -32,7 +32,7 @@ score_plot <- function(score,
   colnames(score) <- c("x", "y", "score")
   g <- ggplot()
   if (!is.null(img) && is(img, "cimg")) {
-    img <- imager::imrotate(img)
+    img <- imager::imrotate(img, 90)
     img <- as.data.frame(img, wide = "c") %>%
         mutate(rgb_val = rgb(c.1, c.2, c.3))
     img$x <- rev(img$x)
