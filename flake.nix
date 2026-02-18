@@ -35,7 +35,8 @@
             Seurat
             styler
             testthat
-            tidyr;
+            tidyr
+            magick;
         };
 
         Vesalius = (pkgs.rPackages.buildRPackage {
