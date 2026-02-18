@@ -31,7 +31,7 @@ score_plot <- function(score,
   targets <- colnames(score)
   colnames(score) <- c("x", "y", "score")
   g <- ggplot()
-  if (!is.null(img) && is(img, "imager")) {
+  if (!is.null(img) && is(img, "cimg")) {
     img <- as.data.frame(img, wide = "c") %>%
         mutate(rgb_val = rgb(c.1, c.2, c.3))
       img$x <- rev(img$x)
