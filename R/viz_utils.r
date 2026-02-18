@@ -32,9 +32,10 @@ score_plot <- function(score,
   colnames(score) <- c("x", "y", "score")
   g <- ggplot()
   if (!is.null(img) && is(img, "cimg")) {
+    img <- imager::imrotate(img)
     img <- as.data.frame(img, wide = "c") %>%
         mutate(rgb_val = rgb(c.1, c.2, c.3))
-      img$x <- rev(img$x)
+    img$x <- rev(img$x)
     g <- g + geom_raster(
       data = img,
       aes(x = x, y = y, fill = rgb_val)
