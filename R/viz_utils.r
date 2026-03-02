@@ -21,6 +21,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom grDevices rgb
 #' @importFrom methods is
+#' @importFrom imager imrotate
 #' @export
 score_plot <- function(score,
                        cex = 10,
