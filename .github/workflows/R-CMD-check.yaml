@@ -26,3 +26,6 @@ jobs:
 
       - name: Run Checks
         uses: r-lib/actions/check-r-package@v2
+        with:
+          build_args: '"--resave-data"'
+          args: '"--no-manual", "--as-cran"'
