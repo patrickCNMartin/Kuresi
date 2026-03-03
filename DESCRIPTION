@@ -26,7 +26,8 @@ Imports: grDevices,
   pwr,
   tibble,
   tidyr,
-  methods
+  methods,
+  imager
 Suggests: knitr,
   RUnit,
   rmarkdown,
